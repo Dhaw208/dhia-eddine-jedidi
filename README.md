@@ -44,6 +44,8 @@ I enjoy working on problems where AI has to perform reliably outside the noteboo
 
 ### 🏭 OctoNorm — Industrial Visual Quality Control
 
+![Concept illustration: OctoNorm — Industrial Visual Quality Control](assets/projects/octonorm-industrial-visual-quality-control.svg)
+
 AI-powered visual inspection system developed during my AI Engineering internship at **Octomiro**.
 
 - Replaced approximately **1 hour of manual production stoppage** with **6–10 second inspections per tray**
@@ -64,6 +66,8 @@ The implementation combines Flask, React and Docker, with production inference o
 
 ### 📄 OCR + BERT Document Classification
 
+![Concept illustration: OCR + BERT Document Classification](assets/projects/ocr-bert-document-classification.svg)
+
 Developed during my internship at **El Fouladh**.
 
 - OCR + BERT document classification pipeline
@@ -81,6 +85,8 @@ A Flask REST API exposes the pipeline for application integration. The reported 
 ---
 
 ### 🎯 YOLOv8 Object Detection
+
+![Concept illustration: YOLOv8 Object Detection](assets/projects/yolov8-object-detection.svg)
 
 Freelance AI project focused on model optimisation.
 
@@ -101,6 +107,8 @@ The project evaluated both detection quality, measured by mAP, and inference lat
 
 ### 📊 BI & Analytics Platform
 
+![Concept illustration: BI & Analytics Platform](assets/projects/bi-analytics-platform.svg)
+
 `PostgreSQL` · `Talend` · `Python` · `Power BI` · `Flask` · `Angular`
 
 - Data warehouse for supply-chain analytics
@@ -118,6 +126,8 @@ Machine learning and deep learning are used for demand forecasting, while Power 
 
 ### 🎥 Video Emotion Recognition
 
+![Concept illustration: Video Emotion Recognition](assets/projects/video-emotion-recognition.svg)
+
 `PyTorch` · `OpenCV` · `3D CNN` · `Autoencoder` · `LSTM` · `Attention`
 
 Built a multi-stage deep learning pipeline for video emotion recognition using the CREMA-D dataset, exposed through a Flask API with a Streamlit webcam interface.
@@ -131,6 +141,8 @@ The pipeline is exposed through a Flask API and paired with a Streamlit webcam i
 ---
 
 ### 🌐 Twitter Influence Graph Analysis
+
+![Concept illustration: Twitter Influence Graph Analysis](assets/projects/twitter-influence-graph-analysis.svg)
 
 `BERTweet` · `GNN` · `Graph-RAG` · `PyTorch Geometric`
 

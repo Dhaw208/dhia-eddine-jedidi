@@ -1,0 +1,19 @@
+{
+  "Python": "python",
+  "Scikit Learn": "scikitlearn",
+  "Pandas": "pandas",
+  "PyTorch": "pytorch",
+  "TensorFlow": "tensorflow",
+  "Keras": "keras",
+  "OpenCV": "opencv",
+  "Docker": "docker",
+  "Flask": "flask",
+  "FastAPI": "fastapi",
+  "Linux": "linux",
+  "Git": "git",
+  "Azure": "azure",
+  "PostgreSQL": "postgresql",
+  "React": "react",
+  "Angular": "angular",
+  "Streamlit": "streamlit"
+}
