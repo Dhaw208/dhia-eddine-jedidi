@@ -8,6 +8,8 @@
 
 ### AI / Machine Learning / Data Science Engineer
 
+![Portrait](assets/portrait.jpeg)
+
 Building AI systems that go beyond notebooks — from experimentation and benchmarking to APIs, Docker deployment and production inference.
 
 📍 Bizerte, Tunisia · Open to relocation
@@ -52,6 +54,12 @@ AI-powered visual inspection system developed during my AI Engineering internshi
 - Production inference running on a **V100S GPU server**
 - Built a retraining workflow accessible from the operator dashboard
 
+#### From manual inspection to an operator-facing system
+
+OctoNorm addresses industrial visual quality control through AI-powered tray inspections. Developed during my AI Engineering internship at Octomiro, it connects model benchmarking with a deployed application that operators can use.
+
+The implementation combines Flask, React and Docker, with production inference on a V100S GPU server. A retraining workflow is accessible from the operator dashboard, bringing model updates into the same application used for inspection.
+
 ---
 
 ### 📄 OCR + BERT Document Classification
@@ -64,6 +72,12 @@ Developed during my internship at **El Fouladh**.
 - Automated document routing
 - Reduced processing time by approximately **90%**
 
+#### From documents to automated routing
+
+This project combines OCR with a BERT document classification pipeline, developed during my internship at El Fouladh. The pipeline supports automated document routing, connecting document processing with classification.
+
+A Flask REST API exposes the pipeline for application integration. The reported results cover both classification quality and document processing time, as listed below.
+
 ---
 
 ### 🎯 YOLOv8 Object Detection
@@ -74,6 +88,12 @@ Freelance AI project focused on model optimisation.
 - Improved mAP from **0.72 → 0.91**
 - Exported and optimised inference using ONNX
 - Reduced inference latency by **45%**
+
+#### Fine-tuning and inference optimisation
+
+This freelance project focused on optimising a YOLOv8 object detection model. The work included fine-tuning the model and exporting it to ONNX for optimised inference.
+
+The project evaluated both detection quality, measured by mAP, and inference latency. This connects model training improvements with the speed of running the model.
 
 ---
 
@@ -88,6 +108,12 @@ Freelance AI project focused on model optimisation.
 - ML/DL demand forecasting
 - Interactive Power BI dashboards
 
+#### Connecting supply-chain data with forecasting
+
+This platform brings together a supply-chain analytics data warehouse, automated ETL pipelines, demand forecasting and interactive dashboards. Its technology stack includes PostgreSQL, Talend, Python, Power BI, Flask and Angular.
+
+Machine learning and deep learning are used for demand forecasting, while Power BI dashboards present the analytics interactively. The project spans data preparation, forecasting and presentation.
+
 ---
 
 ### 🎥 Video Emotion Recognition
@@ -95,6 +121,12 @@ Freelance AI project focused on model optimisation.
 `PyTorch` · `OpenCV` · `3D CNN` · `Autoencoder` · `LSTM` · `Attention`
 
 Built a multi-stage deep learning pipeline for video emotion recognition using the CREMA-D dataset, exposed through a Flask API with a Streamlit webcam interface.
+
+#### A video model with an interactive interface
+
+This project uses the CREMA-D dataset in a multi-stage deep learning pipeline for video emotion recognition. The documented stack includes PyTorch, OpenCV, 3D CNN, autoencoder, LSTM and attention components.
+
+The pipeline is exposed through a Flask API and paired with a Streamlit webcam interface. This makes the project more than a training experiment: it includes an interface for interacting with the video emotion recognition pipeline.
 
 ---
 
@@ -106,6 +138,12 @@ Built a multi-stage deep learning pipeline for video emotion recognition using t
 - **92% sentiment classification accuracy**
 - Influence graph containing 150K nodes and 500K edges
 - Applied GNNs and Graph-RAG for influencer detection
+
+#### Combining sentiment with graph-based analysis
+
+This project combines tweet sentiment analysis with an influence graph for influencer detection. Its documented stack includes BERTweet, GNNs, Graph-RAG and PyTorch Geometric.
+
+Sentiment analysis covers 1.6 million tweets, and the influence graph contains 150,000 nodes and 500,000 edges. GNNs and Graph-RAG are applied to influencer detection, connecting language analysis with relationships represented in the graph.
 
 ---
 
