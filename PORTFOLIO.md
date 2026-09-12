@@ -46,3 +46,11 @@ The master README was left unchanged. Generated dist/ files are intentionally ig
 The README now contains expanded explanations derived from its existing facts. Use `![Portrait](assets/portrait.jpeg)` in the introduction to select the hero image. Each project can include `#### Explanation heading` subsections with paragraphs for its detail page. Keep the concise description before these subsections. Cards include expandable details.
 
 Entrance animations, scroll reveals, hover transitions and cross-document transitions (in supporting browsers) enhance the site. Reduced-motion preferences disable animations. All content and expandable cards remain usable without JavaScript; src/motion.js progressively enhances the static pages.
+
+## Netlify deployment
+
+Connect `Dhaw208/dhia-eddine-jedidi` on branch `main`. Leave the base directory unset (repository root). The included netlify.toml sets the build command to `npm run build`, publish directory to `dist`, and Node.js version to 22. Redeploy the latest commit after changing these settings.
+
+For a manual drag-and-drop deployment, run `npm run build` locally first and upload the generated `dist` folder. Uploading the source repository does not provide an index.html at its root and can result in a 404.
+
+Project pages are generated as individual directories containing index.html, so their URLs can be opened directly. No single-page-app fallback is needed.
