@@ -60,3 +60,7 @@ Project pages are generated as individual directories containing index.html, so 
 Each project references a local SVG concept illustration in the README using standard image syntax. These are labeled illustrations, not screenshots of the applications. The first image appears on the project card and detail page. Replace its README reference with a real screenshot when available; use a descriptive alt text without the `Concept illustration:` prefix for screenshots.
 
 Tools named in the README have locally hosted Devicon logos where available, with readable initials for other technologies and concepts. Icon mappings in src/tool-icons.json are presentation-only; they do not introduce skills or project technologies. Devicon assets retain their license in assets/tools/LICENSE. Source: https://github.com/devicons/devicon.
+
+## WebGL hero
+
+The home page opens with an interactive particle-bust hero (`assets/hero/`, source in `hero/`). It appears only when the browser supports WebGL2 (`html.hero-gl`); otherwise the original portrait hero is shown and the hero script is never downloaded. Content still comes from README.md. See `hero/README.md` to rebuild the bundle or regenerate the particle data.

@@ -1,4 +1,4 @@
-import {readFile,writeFile,mkdir,cp,readdir,rm} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,cp,readdir,rm,stat} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {parseReadme} from './content.mjs';
@@ -14,6 +14,8 @@ const cv = assets.find(f => /(?:cv|resume).*\.(pdf|docx)$/i.test(f));
 const linkedCv = [...readme.matchAll(/\]\(([^)]+\.(?:pdf|docx))\)/gi)].map(m => m[1])[0];
 data.cv = cv ? `/assets/${encodeURIComponent(cv)}` : /^https?:\/\//.test(linkedCv || '') ? linkedCv : null;
 data.todos = [...(!data.cv ? ['TODO: Add an existing CV PDF or DOCX to assets/ or link it in README.md.'] : []), ...(!data.email ? ['TODO: Add a mailto link in README.md if you want an email contact button.'] : []), ...data.projects.filter(p => !p.github).map(p => `TODO: Add a repository link under ${p.title} in README.md if available.`)];
+const size = async f => (await stat(path.join(root,'assets/hero',f))).size;
+const hero = {bin: await size('bust_particles.bin'), png: await size('portrait_cutout.png'), font: await size('anton-subset.woff')};  // real byte totals for the preloader
 const out = path.join(root,'dist');
 await rm(out,{recursive:true,force:true});
 await mkdir(path.join(out,'data'),{recursive:true});
@@ -21,7 +23,7 @@ await cp(path.join(root,'assets'),path.join(out,'assets'),{recursive:true});
 await cp(path.join(root,'src/style.css'),path.join(out,'style.css'));
 await cp(path.join(root,'src/motion.js'),path.join(out,'motion.js'));
 await writeFile(path.join(out,'data/portfolio.json'),JSON.stringify(data,null,2));
-await writeFile(path.join(out,'index.html'),render(data));
+await writeFile(path.join(out,'index.html'),render(data,undefined,hero));
 for (const project of data.projects) {
   const directory = path.join(out,'projects',project.slug);
   await mkdir(directory,{recursive:true});
