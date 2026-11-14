@@ -15,10 +15,10 @@ const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t
 const RAD = Math.PI / 180;
 
 const CRIMSON = new THREE.Vector3(0.64, 0.035, 0.055);
-const REVEAL_BAND_SECONDS = 3.6;                   // light band top -> bottom
+const REVEAL_BAND_SECONDS = 1.8;                   // light band top -> bottom (fast)
 const U_BAND_END = 0.7;                            // fraction of u at which the band exits the bottom
 const U_SECONDS = REVEAL_BAND_SECONDS / U_BAND_END; // 5.14 s of u-time
-const PRE_ROLL = 0.7;                              // head turns forward before the band starts
+const PRE_ROLL = 0.3;                              // head turns forward before the band starts
 const REVEAL_TOTAL = PRE_ROLL + U_SECONDS;
 const Y_TOP = 450, Y_BOT = -490;                   // band travel range (world y)
 
@@ -386,7 +386,7 @@ void main(){
   /* ----------------------------- loop ------------------------------ */
   let t0 = performance.now(), last = t0, time = 0, introT = -1, started = false;
   function startIntro() { started = true; introT = 0; loaderEl.classList.add('done'); }
-  const INTRO_SECONDS = 3.4, SWEEP_START = 3.0, SWEEP_SECONDS = 1.9;
+  const INTRO_SECONDS = 3.2, SWEEP_START = 2.8, SWEEP_SECONDS = 1.5, AUTO_REVEAL_AT = 4.5;   // reveal starts by itself once the intro sweep has passed
   const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function frame(now) {
@@ -400,6 +400,7 @@ void main(){
         U.uBandY.value = lerp(Y_TOP, Y_BOT, clamp(q, 0, 1)); U.uBandAmp.value = Math.sin(clamp(q, 0, 1) * Math.PI) ** 0.6;
       }
       if (introT >= INTRO_SECONDS - 0.2 && !S.ready) { S.ready = true; btn.classList.add('show'); }
+      if (introT >= AUTO_REVEAL_AT && !S.auto && S.ready) { S.auto = true; if (S.Pt === 0) { S.Pt = 1; btn.dataset.busy = '1'; btn.classList.add('busy'); } }
     }
     // reveal progress P (0..1) -> u
     if (!S.manual) {
