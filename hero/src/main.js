@@ -15,7 +15,7 @@ const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t
 const RAD = Math.PI / 180;
 
 const CRIMSON = new THREE.Vector3(0.64, 0.035, 0.055);
-const REVEAL_BAND_SECONDS = 0.45;                  // light band top -> bottom: dots become the face in ~0.7 s
+const REVEAL_BAND_SECONDS = 0.35;                  // light band top -> bottom: dots become the face in ~0.55 s
 const U_BAND_END = 0.7;                            // fraction of u at which the band exits the bottom
 const U_SECONDS = REVEAL_BAND_SECONDS / U_BAND_END; // 5.14 s of u-time
 const PRE_ROLL = 0.08;                             // head snaps forward before the band starts
@@ -125,13 +125,22 @@ void main(){
   vec3 R = rot(P, yaw, pitch, uPivot);
   vec3 Nr = normalize(rotN(N, yaw, pitch));
 
-  // --- intro: leave the loading ring, fly into place ---
-  float ang = r1*6.2831853;
-  vec3 ringP = vec3(cos(ang), sin(ang), 0.0) * (uRingR + (r2-0.5)*uRingR*0.06) + vec3(0.0, uCamY, 0.0);
-  float delay = r3*0.40 + (1.0-clamp((P.y+280.0)/720.0,0.0,1.0))*0.14;
-  float e = clamp((uIntro-delay)/0.46, 0.0, 1.0); e = e*e*e*(e*(e*6.0-15.0)+10.0);
-  vec3 swirl = (vec3(r4,r5,r6)-0.5) * vec3(640.0,640.0,0.0) * sin(3.14159*e);
-  vec3 pos = mix(ringP, R, e) + swirl;
+  // --- intro: black-hole collapse. Every dot starts on a wide, tilted accretion disc and
+  //     spirals inward (outer dots orbit more turns) until it lands exactly on its face position.
+  vec2 hole = vec2(0.0, uCamY);
+  vec2 d = R.xy - hole;
+  float rt = length(d), at = atan(d.y, d.x);
+  float delay = r3*0.16 + (1.0 - clamp(rt/700.0, 0.0, 1.0))*0.08;   // outer face dots land first, the core last
+  float e = clamp((uIntro-delay)/0.76, 0.0, 1.0);
+  float k = 1.0 - pow(1.0 - e, 3.0);                                // fast fall, soft landing
+  const float HORIZON = 150.0;                                      // empty "event horizon" in the middle of the disc
+  float r0 = HORIZON + pow(r2, 1.8)*620.0;                          // dense near the horizon, thinning outward
+  float turns = (1.2 + 1.6*(1.0 - r2)) * 6.2831853;                 // inner orbits spin more turns (Kepler-ish)
+  float rr = mix(r0, rt, k);
+  float aa = at + turns * pow(1.0 - k, 2.0) + (1.0 - k)*uTime*2.2;   // keeps swirling while waiting to fall
+  float squash = mix(0.42, 1.0, smoothstep(0.0, 0.85, k));           // disc seen at an angle, opens up as it collapses
+  vec3 pos = vec3(hole + vec2(cos(aa), sin(aa)*squash) * rr, R.z * k);
+  float orbitGlow = (1.0 - k) * exp(-max(rr - HORIZON, 0.0)/120.0);   // bright photon ring around the horizon
 
   // --- reveal: band sweep flattens particles onto the portrait ---
   float hitT = clamp((uYTop-P.y)/(uYTop-uYBot), 0.0, 1.0);
@@ -150,7 +159,7 @@ void main(){
   float cur = uCursorAmp * exp(-dot(dc,dc)/(2.0*uCursorR*uCursorR)) * (0.40 + 0.60*max(facing,0.0));
   float bd = uBandAmp * exp(-pow((pos.y-uBandY)/42.0, 2.0));
   I += 2.1*cur + 1.15*bd;
-  I *= mix(0.42, 1.0, e);                                 // dim while still on the ring
+  I = I * mix(0.75, 1.0, k) + 3.2*orbitGlow;              // bright ring at the horizon while collapsing
 
   float sz = (4.8 + 3.6*pow(r6, 1.7)) * uSize;
   sz *= 1.0 + 0.55*cur + 0.35*bd;
@@ -161,7 +170,7 @@ void main(){
   vec3 pc = textureLod(uPhoto, puv, 0.0).rgb;
   col = mix(col, pc*1.05, smoothstep(0.0, 0.5, local));
   vColor = col;
-  float ringFade = mix(0.007, 1.0, smoothstep(0.0, 0.5, e));   // 78k particles stacked on the ring would blow out: keep it dark crimson
+  float ringFade = mix(0.55, 1.0, smoothstep(0.0, 0.7, k));
   vAlpha = (1.0 - f2) * ringFade;
   vCover = smoothstep(0.75, 1.0, e);
   gl_Position = projectionMatrix * viewMatrix * vec4(pos, 1.0);
@@ -386,7 +395,7 @@ void main(){
   /* ----------------------------- loop ------------------------------ */
   let t0 = performance.now(), last = t0, time = 0, introT = -1, started = false;
   function startIntro() { started = true; introT = 0; loaderEl.classList.add('done'); }
-  const INTRO_SECONDS = 1.2, SWEEP_START = 0.7, SWEEP_SECONDS = 0.5, AUTO_REVEAL_AT = 1.3;   // quick fly-in, then the reveal starts by itself
+  const INTRO_SECONDS = 0.9, SWEEP_START = 0.55, SWEEP_SECONDS = 0.35, AUTO_REVEAL_AT = 0.95;   // black-hole collapse, then the photo reveal starts by itself
   const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function frame(now) {
@@ -419,7 +428,7 @@ void main(){
       U.uBandY.value = lerp(Y_TOP, Y_BOT, clamp(u / U_BAND_END, 0, 1)); U.uBandAmp.value = bandOn;
     } else U.uU.value = 0;
     U.uDust.value = 1 - smooth(0.0, 0.6, u);
-    C.uBanner.value = smooth(0.02, 0.4, U.uIntro.value);
+    C.uBanner.value = smooth(0.7, 1.0, U.uIntro.value);           // banner only appears once the face has formed
 
     // head targets
     const locked = S.P > 0.001 || !started;
