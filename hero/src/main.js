@@ -15,10 +15,10 @@ const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t
 const RAD = Math.PI / 180;
 
 const CRIMSON = new THREE.Vector3(0.64, 0.035, 0.055);
-const REVEAL_BAND_SECONDS = 1.8;                   // light band top -> bottom (fast)
+const REVEAL_BAND_SECONDS = 0.45;                  // light band top -> bottom: dots become the face in ~0.7 s
 const U_BAND_END = 0.7;                            // fraction of u at which the band exits the bottom
 const U_SECONDS = REVEAL_BAND_SECONDS / U_BAND_END; // 5.14 s of u-time
-const PRE_ROLL = 0.3;                              // head turns forward before the band starts
+const PRE_ROLL = 0.08;                             // head snaps forward before the band starts
 const REVEAL_TOTAL = PRE_ROLL + U_SECONDS;
 const Y_TOP = 450, Y_BOT = -490;                   // band travel range (world y)
 
@@ -335,7 +335,7 @@ void main(){
     renderer.setPixelRatio(dpr); renderer.setSize(cssW, cssH, false);
     const aspect = cssW / cssH;
     visH = H.ph / 1.12; visW = visH * aspect;                  // portrait 12% larger than fit-to-height
-    if (visW < 800) { visW = 800; visH = visW / aspect; }      // narrow / mobile: keep head + shoulders in frame
+    if (visW < 1000) { visW = 1000; visH = visW / aspect; }    // side panel / mobile: keep head + shoulders in frame
     camY = visH > H.ph + 1 ? visH / 2 - H.ph / 2 : 0;           // tall screens: portrait base sits on the bottom edge
     C_CAMY.value = camY;
     cam.left = -visW / 2; cam.right = visW / 2; cam.top = camY + visH / 2; cam.bottom = camY - visH / 2; cam.updateProjectionMatrix();
@@ -386,7 +386,7 @@ void main(){
   /* ----------------------------- loop ------------------------------ */
   let t0 = performance.now(), last = t0, time = 0, introT = -1, started = false;
   function startIntro() { started = true; introT = 0; loaderEl.classList.add('done'); }
-  const INTRO_SECONDS = 3.2, SWEEP_START = 2.8, SWEEP_SECONDS = 1.5, AUTO_REVEAL_AT = 4.5;   // reveal starts by itself once the intro sweep has passed
+  const INTRO_SECONDS = 1.2, SWEEP_START = 0.7, SWEEP_SECONDS = 0.5, AUTO_REVEAL_AT = 1.3;   // quick fly-in, then the reveal starts by itself
   const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function frame(now) {
@@ -437,7 +437,7 @@ void main(){
     }
     U.uYaw.value = S.yaw; U.uPitch.value = S.pitch;
     // cursor light
-    const lightOn = S.interacted && S.inside && S.P < 0.001 && started && introT > 2.0;
+    const lightOn = S.interacted && S.inside && S.P < 0.001 && started && introT > INTRO_SECONDS * 0.6;
     S.curAmp += ((lightOn ? 1 : 0) - S.curAmp) * (1 - Math.exp(-dt * 5));
     S.cur.lerp(S.curT, 1 - Math.exp(-dt * 12));
     U.uCursor.value.set(S.cur.x, S.cur.y, 120); U.uCursorAmp.value = S.curAmp;
