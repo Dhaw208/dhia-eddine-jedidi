@@ -21,6 +21,9 @@ const U_SECONDS = REVEAL_BAND_SECONDS / U_BAND_END; // 5.14 s of u-time
 const PRE_ROLL = 0.08;                             // head snaps forward before the band starts
 const REVEAL_TOTAL = PRE_ROLL + U_SECONDS;
 const Y_TOP = 450, Y_BOT = -490;                   // band travel range (world y)
+const KEEP = 0.4;                                  // fraction of the baked particles drawn (fewer, larger dots)
+const SIZE_BOOST = 1 / Math.sqrt(KEEP) * 0.85;     // grow dots so the thinner cloud still reads as a face
+const GAIN_BOOST = Math.min(1.8, 1 / Math.sqrt(KEEP));
 
 /* ============================ LOADER ============================== */
 // Progress = real bytes received / real total bytes. Standalone build decodes embedded
@@ -76,12 +79,17 @@ function parseBust(u8) {
   const pz = new Int16Array(u8.buffer.slice(base + o, base + o + 2 * N)); o += 2 * N;
   const nx = u8.subarray(o, o + N); o += N; const ny = u8.subarray(o, o + N); o += N; const nz = u8.subarray(o, o + N); o += N;
   const rnd = u8.subarray(o, o + N); o += N; const br = u8.subarray(o, o + N);
-  const pos = new Int16Array(N * 3), nrm = new Int8Array(N * 4), ab = new Uint8Array(N * 2);
-  for (let i = 0; i < N; i++) {
-    pos[3 * i] = px[i]; pos[3 * i + 1] = py[i]; pos[3 * i + 2] = pz[i];
-    nrm[4 * i] = (nx[i] << 24) >> 24; nrm[4 * i + 1] = (ny[i] << 24) >> 24; nrm[4 * i + 2] = (nz[i] << 24) >> 24;
-    ab[2 * i] = rnd[i]; ab[2 * i + 1] = br[i];
+  // Evenly thin the cloud with a hash of the index (unbiased: no region loses more dots than another).
+  const keep = []; for (let i = 0; i < N; i++) if (((Math.imul(i, 2654435761) >>> 0) / 4294967296) < KEEP) keep.push(i);
+  const M = keep.length;
+  const pos = new Int16Array(M * 3), nrm = new Int8Array(M * 4), ab = new Uint8Array(M * 2);
+  for (let j = 0; j < M; j++) {
+    const i = keep[j];
+    pos[3 * j] = px[i]; pos[3 * j + 1] = py[i]; pos[3 * j + 2] = pz[i];
+    nrm[4 * j] = (nx[i] << 24) >> 24; nrm[4 * j + 1] = (ny[i] << 24) >> 24; nrm[4 * j + 2] = (nz[i] << 24) >> 24;
+    ab[2 * j] = rnd[i]; ab[2 * j + 1] = br[i];
   }
+  h.N = M;
   return { h, pos, nrm, ab };
 }
 
@@ -294,7 +302,7 @@ void main(){
     uBandY: { value: Y_TOP }, uBandAmp: { value: 0 }, uU: { value: 0 }, uYTop: { value: Y_TOP }, uYBot: { value: Y_BOT }, uDust: { value: 1 },
     uPivot: { value: new THREE.Vector3(...H.pivot) }, uCursor: { value: new THREE.Vector3(0, 0, 120) },
     uNeckY: { value: new THREE.Vector2(H.ph / 2 - H.neck0, H.ph / 2 - H.neck1) },
-    uPhotoSize: { value: new THREE.Vector2(H.pw, H.ph) }, uPhoto: { value: photoTex }, uGain: { value: 0.8 }, uBase: { value: 0.08 }, uK: { value: 2.0 }, uGam: { value: 1.6 },
+    uPhotoSize: { value: new THREE.Vector2(H.pw, H.ph) }, uPhoto: { value: photoTex }, uGain: { value: 0.8 * GAIN_BOOST }, uBase: { value: 0.08 }, uK: { value: 2.0 }, uGam: { value: 1.6 },
   };
   const pMat = new THREE.ShaderMaterial({ vertexShader: PARTICLE_VS, fragmentShader: PARTICLE_FS, uniforms: U,
     transparent: true, depthTest: false, depthWrite: false, blending: THREE.CustomBlending, blendEquation: THREE.AddEquation,
@@ -353,7 +361,7 @@ void main(){
     rt = new THREE.WebGLRenderTarget(bw, bh, { type: THREE.HalfFloatType, format: THREE.RGBAFormat, depthBuffer: false, stencilBuffer: false,
       generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter });
     C.tP.value = rt.texture;
-    const pxPerUnit = bh / visH; U.uPx.value = pxPerUnit; U.uSize.value = 1;
+    const pxPerUnit = bh / visH; U.uPx.value = pxPerUnit; U.uSize.value = SIZE_BOOST;
     U.uRingR.value = (Math.min(cssW, cssH) < 520 ? 40 : 52) * (cssH / visH) ;
     U.uCursorR.value = 80;
     C.uView.value.set(visW, visH); C.uRes.value.set(bw, bh); dMat.uniforms.uView.value.set(visW, visH);
