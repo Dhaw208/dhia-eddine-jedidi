@@ -10,7 +10,7 @@ test('extracts the complete profile without manufacturing facts', () => {
  assert.equal(data.projects.length,6); assert.equal(data.experience.length,3);
  assert.equal(data.education.length,2); assert.equal(data.certifications.length,6);
  assert.equal(data.skills.length,5); assert.equal(data.email,undefined);
- for (const p of data.projects) {assert.equal(p.github,undefined); if (p.slug !== 'ocr-bert-document-classification') assert.equal(p.demo,undefined);}
+ for (const p of data.projects) {assert.equal(p.github,undefined); if (!['ocr-bert-document-classification','bi-analytics-platform'].includes(p.slug)) assert.equal(p.demo,undefined);}
  assert.ok(data.projects[0].highlights.includes('Achieved 0.967 AUROC'));
  assert.equal(data.summary,'Building AI systems that go beyond notebooks — from experimentation and benchmarking to APIs, Docker deployment and production inference.');
 });

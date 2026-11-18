@@ -118,6 +118,8 @@ The project evaluated both detection quality, measured by mAP, and inference lat
 - ML/DL demand forecasting
 - Interactive Power BI dashboards
 
+[Live Demo](https://www.linkedin.com/feed/update/urn:li:ugcPost:7331246649878454272/)
+
 #### Connecting supply-chain data with forecasting
 
 This platform brings together a supply-chain analytics data warehouse, automated ETL pipelines, demand forecasting and interactive dashboards. Its technology stack includes PostgreSQL, Talend, Python, Power BI, Flask and Angular.
