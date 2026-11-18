@@ -76,19 +76,45 @@
   const px = new Float32Array(n), py = new Float32Array(n), pd = new Float32Array(n);
   const RED = '217,42,57';
 
-  // ---- robot arm: reaches in from the right and touches the frontal lobe with a single finger ----
-  const FILL = '#1a0d11', EDGE = '#d92a39';
-  const cerebN = n - cbN - 26;                       // cerebrum nodes come first in P
-  let tgt = 0, best = -9;                            // contact point: the frontal pole, mid-height
-  for (let i = 0; i < cerebN; i++) { const sc = P[i][2] - Math.abs(P[i][1] - 0.1) * 1.4; if (sc > best) { best = sc; tgt = i; } }
-  let lastCycle = -1, tapT = -9;
-  const stroke = (ax, ay, bx, by, w, col) => { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke(); };
-  const cap = (ax, ay, bx, by, r) => { ctx.lineCap = 'round'; stroke(ax, ay, bx, by, 2 * r + 2, EDGE); stroke(ax, ay, bx, by, 2 * r, FILL); };
-  const dot = (x, y, r, fill, edge) => { ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); ctx.fillStyle = fill; ctx.fill(); if (edge) { ctx.strokeStyle = edge; ctx.lineWidth = 1.4; ctx.stroke(); } };
-  const joint = (x, y, r, t) => {
-    dot(x, y, r, FILL, EDGE); dot(x, y, r * 0.5, '#2a1218', 'rgba(217,42,57,.6)');
-    dot(x, y, r * 0.2, `rgba(255,214,218,${0.65 + 0.35 * Math.sin(t * 3 + x)})`);   // blinking LED
+  // ---- robot arm: built like the brain (nodes joined by synapses, with pulses), reaching in from the right ----
+  // One-time topology: arm+palm is a 4-wide mesh of stations, the index finger a 3-wide mesh, plus thumb and curled-finger stubs.
+  const ARM_K = 4, ARM_M = [9, 8, 4], ARM_S = ARM_M[0] + ARM_M[1] + ARM_M[2] + 1;     // stations along shoulder -> elbow -> wrist -> palm
+  const FIN_K = 3, FIN_S = 7;
+  const aIdx = (j, c) => j * ARM_K + c;
+  const fBase = ARM_S * ARM_K, fIdx = (j, c) => fBase + j * FIN_K + c;
+  const thumbB = fBase + FIN_S * FIN_K, curlB = thumbB + 3, AN = curlB + 3;
+  const AE = [];                                     // [a, b, outline?]
+  const lnk = (a, b, o = 0) => AE.push([a, b, o]);
+  const mesh = (M, K, idx) => {
+    for (let j = 0; j < M; j++) for (let c = 0; c < K; c++) {
+      if (j + 1 < M) lnk(idx(j, c), idx(j + 1, c), c === 0 || c === K - 1 ? 1 : 0);
+      if (c + 1 < K) lnk(idx(j, c), idx(j, c + 1));
+      if (j + 1 < M && c + 1 < K) (j + c) % 2 ? lnk(idx(j, c), idx(j + 1, c + 1)) : lnk(idx(j, c + 1), idx(j + 1, c));
+    }
   };
+  mesh(ARM_S, ARM_K, aIdx); mesh(FIN_S, FIN_K, fIdx);
+  const pj = ARM_S - 1;                              // palm-front station: the finger, thumb and curled fingers grow out of it
+  lnk(fIdx(0, 0), aIdx(pj, 0), 1); lnk(fIdx(0, 1), aIdx(pj, 1)); lnk(fIdx(0, 2), aIdx(pj, 2)); lnk(fIdx(0, 1), aIdx(pj, 0)); lnk(fIdx(0, 2), aIdx(pj, 1));
+  lnk(thumbB, aIdx(pj - 3, 0), 1); lnk(thumbB, aIdx(pj - 2, 0)); lnk(thumbB, aIdx(pj - 2, 1)); lnk(thumbB, thumbB + 1, 1); lnk(thumbB + 1, thumbB + 2, 1); lnk(thumbB + 1, aIdx(pj - 2, 0));
+  for (let k = 0; k < 3; k++) { lnk(aIdx(pj, k + 1), curlB + k, 1); lnk(aIdx(pj - 1, k + 1), curlB + k); }
+  const aAdj = Array.from({ length: AN }, () => []);
+  for (const [a, b] of AE) { aAdj[a].push(b); aAdj[b].push(a); }
+  const TIP = fIdx(FIN_S - 1, 1);                    // fingertip node
+  const aDist = new Int16Array(AN).fill(-1); aDist[TIP] = 0;                          // hops to the fingertip, so pulses can flow towards it
+  for (let q = [TIP], h = 0; h < q.length; h++) for (const b of aAdj[q[h]]) if (aDist[b] < 0) { aDist[b] = aDist[q[h]] + 1; q.push(b); }
+  const startNodes = []; for (let j = 0; j < 5; j++) for (let c = 0; c < ARM_K; c++) startNodes.push(aIdx(j, c));   // pulses are born at the shoulder end
+  const jit = new Float32Array(AN * 2); for (let i = 0; i < jit.length; i++) jit[i] = (rnd() - 0.5) * 0.018;   // a little organic irregularity
+  const AX = new Float32Array(AN), AY = new Float32Array(AN), aGlow = new Float32Array(AN);
+  const aPulses = [];
+  const nextHop = a => { const o = aAdj[a].filter(b => aDist[b] < aDist[a]); return o.length ? o[(rnd() * o.length) | 0] : a; };
+  for (let i = 0; i < (small ? 5 : 9); i++) { const a = startNodes[(rnd() * startNodes.length) | 0]; aPulses.push({ a: nextHop(a), b: nextHop(nextHop(a)), t: rnd(), v: 5 + rnd() * 2.5 }); }
+  const WS = [-1, -0.33, 0.33, 1], WF = [-1, 0, 1];
+
+  const cerebN = n - cbN - 26;                       // cerebrum nodes come first in P
+  let tgt = 0, best = -9;                            // contact point on the brain: the frontal pole, mid-height
+  for (let i = 0; i < cerebN; i++) { const sc = P[i][2] - Math.abs(P[i][1] - 0.1) * 1.4; if (sc > best) { best = sc; tgt = i; } }
+  let lastCycle = -1, tapT = -9, bridgeT = -9, tipGlow = 0;
+  const dot = (x, y, r, fill, edge, lw = 1.4) => { ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); if (fill) { ctx.fillStyle = fill; ctx.fill(); } if (edge) { ctx.strokeStyle = edge; ctx.lineWidth = lw; ctx.stroke(); } };
 
   function zap(k) {                                  // a tap fires the neurons under the fingertip
     const near = [];
@@ -100,20 +126,29 @@
     }
   }
 
-  function drawRobot(t, S, cx, cy, alpha) {
+  // places a mesh's stations: centres C (array of [x,y]), radii R, widths W -> writes node positions through put()
+  const lay = (C, R, W, put) => {
+    for (let i = 0; i < C.length; i++) {
+      const a = C[Math.max(0, i - 1)], b = C[Math.min(C.length - 1, i + 1)];
+      const tx_ = b[0] - a[0], ty_ = b[1] - a[1], m = Math.hypot(tx_, ty_) || 1, ux_ = tx_ / m, uy_ = ty_ / m;
+      for (let c = 0; c < W.length; c++) put(i, c, C[i][0] - uy_ * W[c] * R[i], C[i][1] + ux_ * W[c] * R[i], ux_, uy_);
+    }
+  };
+
+  function drawRobot(t, dt, S, cx, cy, alpha) {
     if (alpha < 0.02) return;
-    const k = S / 390;
-    ctx.save(); ctx.globalAlpha = alpha; ctx.lineJoin = 'round';
+    const k = S / 390, SR = S * 0.012;
+    ctx.save(); ctx.globalAlpha = alpha; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     const th = Math.atan2(-0.1, -1) + 0.035 * Math.sin(t * 0.7);          // the finger points left, slightly up
-    const ux = Math.cos(th), uy = Math.sin(th), nx = uy, ny = -ux;       // u = along finger, n = towards palm side (down)
+    const ux = Math.cos(th), uy = Math.sin(th), nx = uy, ny = -ux;       // u = along the finger, n = towards the palm (down)
     const cyc = reduce ? 0 : t / 2.6, ph = cyc - Math.floor(cyc);
     const press = reduce ? 0 : Math.pow(0.5 - 0.5 * Math.cos(ph * 6.2832), 1.6);   // 0 = touching, 1 = lifted
     if (!reduce && Math.floor(cyc) !== lastCycle) { lastCycle = Math.floor(cyc); tapT = t; zap(k); }
-    const rt = 0.02 * S, off = rt + (1 + 24 * press) * k;
+    const rt = 0.02 * S, off = rt * 0.4 + (1 + 24 * press) * k;
     const Fx = px[tgt] - ux * off, Fy = py[tgt] - uy * off;               // fingertip
 
-    // index finger, built backwards from the tip so it always lands on the brain
-    const L = [0.1 * S, 0.09 * S, 0.08 * S], R = [0.028 * S, 0.025 * S, 0.022 * S], bend = [0, 0.06, 0.14];
+    // index finger polyline, built backwards from the tip so it always lands on the brain
+    const L = [0.1 * S, 0.09 * S, 0.08 * S], bend = [0, 0.06, 0.14];
     const pts = [[Fx, Fy]];
     for (let i = 2; i >= 0; i--) { const a = th + bend[i], q = pts[pts.length - 1]; pts.push([q[0] - Math.cos(a) * L[i], q[1] - Math.sin(a) * L[i]]); }
     pts.reverse();                                                         // knuckle -> tip
@@ -123,38 +158,81 @@
     // two-bone arm from a shoulder far off-screen to the right
     const sx = cx + 2.7 * S, sy0 = cy + 0.25 * S + 8 * k * Math.sin(t * 0.6);
     const A1 = 0.85 * S, A2 = 0.8 * S;
-    let dx = wx - sx, dy = wy - sy0, d = Math.min(Math.hypot(dx, dy), A1 + A2 - 1); d = Math.max(d, Math.abs(A1 - A2) + 1);
-    const al = (A1 * A1 - A2 * A2 + d * d) / (2 * d), h = Math.sqrt(Math.max(0, A1 * A1 - al * al)), m = Math.hypot(dx, dy) || 1;
+    let dx = wx - sx, dy = wy - sy0, m = Math.hypot(dx, dy) || 1, d = Math.max(Math.min(m, A1 + A2 - 1), Math.abs(A1 - A2) + 1);
+    const al = (A1 * A1 - A2 * A2 + d * d) / (2 * d), h = Math.sqrt(Math.max(0, A1 * A1 - al * al));
     const bx = sx + dx / m * al, by = sy0 + dy / m * al;
     let ex = bx - dy / m * h, ey = by + dx / m * h;
     if (ey < by) { ex = bx + dy / m * h; ey = by - dx / m * h; }          // elbow hangs below the line
 
-    // upper arm, forearm (with panel seams), elbow
-    cap(sx, sy0, ex, ey, 0.075 * S); cap(ex, ey, wx, wy, 0.062 * S);
-    const fl = Math.hypot(wx - ex, wy - ey) || 1, fx = (wx - ex) / fl, fy = (wy - ey) / fl;
-    for (const s of [0.28, 0.5, 0.72]) {
-      const mx0 = ex + (wx - ex) * s, my0 = ey + (wy - ey) * s, r = 0.062 * S;
-      stroke(mx0 - fy * r, my0 + fx * r, mx0 + fy * r, my0 - fx * r, 1.2, 'rgba(217,42,57,.55)');
-    }
-    stroke(ex - fy * 0.03 * S, ey + fx * 0.03 * S, wx - fy * 0.03 * S, wy + fx * 0.03 * S, Math.max(1, 0.012 * S), 'rgba(255,230,232,.2)');
-    joint(ex, ey, 0.09 * S, t);
+    // ---- node positions ----
+    const lerp = (a, b, f) => a + (b - a) * f;
+    const C = [], R = [], bones = [[sx, sy0, ex, ey], [ex, ey, wx, wy], [wx, wy, Qx, Qy]];
+    const rad = [[0.070, 0.078], [0.088, 0.056], [0.072, 0.088]];        // radius range per bone (in S); the elbow station bulges
+    bones.forEach((b, bi) => { for (let j = 0; j < ARM_M[bi]; j++) { const f = j / ARM_M[bi]; C.push([lerp(b[0], b[2], f), lerp(b[1], b[3], f)]); R.push(S * (bi === 1 && j > 0 ? lerp(0.066, rad[1][1], f) : lerp(rad[bi][0], rad[bi][1], bi === 1 ? 0 : f))); } });
+    C.push([Qx, Qy]); R.push(0.088 * S);
+    lay(C, R, WS, (i, c, x, y) => { const id = aIdx(i, c); AX[id] = x + jit[id * 2] * S; AY[id] = y + jit[id * 2 + 1] * S; });
 
-    // hand: palm, thumb, three curled fingers, extended index finger
-    cap(wx, wy, Qx, Qy, 0.085 * S);
-    cap(wx + ux * 0.06 * S - nx * 0.07 * S, wy + uy * 0.06 * S - ny * 0.07 * S, wx + ux * 0.15 * S - nx * 0.13 * S, wy + uy * 0.15 * S - ny * 0.13 * S, 0.03 * S);
-    for (const o of [0.005, 0.05, 0.088]) {
-      const kx = Qx + nx * o * S, ky = Qy + ny * o * S;
-      cap(kx, ky, kx + ux * 0.04 * S + nx * 0.02 * S, ky + uy * 0.04 * S + ny * 0.02 * S, 0.03 * S);
+    const FC = [], FR = [];
+    for (let s = 0; s < FIN_S; s++) {
+      const seg = (s / (FIN_S - 1)) * 3, i = Math.min(2, Math.floor(seg)), f = seg - i;
+      FC.push([lerp(pts[i][0], pts[i + 1][0], f), lerp(pts[i][1], pts[i + 1][1], f)]); FR.push(S * lerp(0.03, 0.019, s / (FIN_S - 1)));
     }
-    for (let i = 0; i < 3; i++) cap(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], R[i]);
-    for (let i = 0; i < 3; i++) dot(pts[i][0], pts[i][1], R[i] * 0.55, '#2a1218', 'rgba(217,42,57,.7)');
-    dot(Fx, Fy, rt * 0.55, 'rgba(255,214,218,.9)');                       // glowing fingertip sensor
-    joint(wx, wy, 0.07 * S, t);
+    lay(FC, FR, WF, (i, c, x, y) => { const id = fIdx(i, c), tip = i === FIN_S - 1 && c === 1; AX[id] = x + (tip ? 0 : jit[id * 2] * S); AY[id] = y + (tip ? 0 : jit[id * 2 + 1] * S); });
+    const tb = [wx + ux * 0.06 * S - nx * 0.07 * S, wy + uy * 0.06 * S - ny * 0.07 * S], tt = [wx + ux * 0.15 * S - nx * 0.13 * S, wy + uy * 0.15 * S - ny * 0.13 * S];
+    [[tb[0], tb[1]], [(tb[0] + tt[0]) / 2, (tb[1] + tt[1]) / 2], [tt[0], tt[1]]].forEach((p, i) => { AX[thumbB + i] = p[0]; AY[thumbB + i] = p[1]; });
+    for (let c = 0; c < 3; c++) { const a = aIdx(pj, c + 1); AX[curlB + c] = AX[a] + ux * 0.05 * S + nx * 0.03 * S; AY[curlB + c] = AY[a] + uy * 0.05 * S + ny * 0.03 * S; }
 
-    // contact spark + shock ring on every tap
+    // ---- synapses: soft inner mesh, brighter outline ----
+    for (let i = 0; i < AN; i++) if (aGlow[i] > 0) aGlow[i] = Math.max(0, aGlow[i] - dt * 1.6);
+    for (const [o, col, lw] of [[0, `rgba(${RED},.4)`, 1], [1, `rgba(${RED},.85)`, 1.7]]) {
+      ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.beginPath();
+      for (const e of AE) if (e[2] === o) { ctx.moveTo(AX[e[0]], AY[e[0]]); ctx.lineTo(AX[e[1]], AY[e[1]]); }
+      ctx.stroke();
+    }
+    // ---- nodes ----
+    ctx.fillStyle = 'rgba(243,236,236,.85)'; ctx.beginPath();
+    for (let i = 0; i < AN; i++) { ctx.moveTo(AX[i] + 1.9, AY[i]); ctx.arc(AX[i], AY[i], 1.9, 0, 6.2832); }
+    ctx.fill();
+    // mechanical joints: ring + blinking LED at the elbow, wrist and finger knuckles
+    const ring = (x, y, r) => { dot(x, y, r, null, `rgba(${RED},.9)`, 1.4); dot(x, y, r * 0.55, null, `rgba(${RED},.45)`, 1); dot(x, y, Math.max(2, r * 0.2), `rgba(255,214,218,${0.65 + 0.35 * Math.sin(t * 3 + x)})`); };
+    ring(ex, ey, 0.092 * S); ring(wx, wy, 0.07 * S); ring(pts[1][0], pts[1][1], 0.03 * S); ring(pts[2][0], pts[2][1], 0.027 * S);
+
+    // ---- pulses flowing along the arm towards the fingertip ----
+    let arrived = false;
+    for (const p of aPulses) {
+      if (!reduce) p.t += dt * p.v;
+      while (p.t >= 1) {
+        p.t -= 1; aGlow[p.b] = 1; p.a = p.b;
+        if (p.a === TIP) { arrived = true; tipGlow = 1; const s0 = startNodes[(rnd() * startNodes.length) | 0]; p.a = s0; p.b = nextHop(s0); }
+        else p.b = nextHop(p.a);
+        if (p.a === p.b) { const s0 = startNodes[(rnd() * startNodes.length) | 0]; p.a = s0; p.b = nextHop(s0); }
+      }
+      const x = AX[p.a] + (AX[p.b] - AX[p.a]) * p.t, y = AY[p.a] + (AY[p.b] - AY[p.a]) * p.t;
+      dot(x, y, 7, `rgba(${RED},.2)`); dot(x, y, 2, 'rgba(255,214,218,.95)');
+    }
+    for (let i = 0; i < AN; i++) if (aGlow[i] > 0.04) { const g = aGlow[i]; dot(AX[i], AY[i], 3 + 6 * g, `rgba(${RED},${0.3 * g})`); dot(AX[i], AY[i], 2.2, `rgba(255,214,218,${0.85 * g})`); }
+    if (arrived && bridgeT < 0) bridgeT = t;                              // energy leaves the fingertip and crosses into the brain
+
+    // ---- the fingertip joins the brain's network: synapses to the nearest brain neurons ----
+    tipGlow = Math.max(0, tipGlow - dt * 1.4);
+    const near = [];
+    for (let i = 0; i < n; i++) { const dd = Math.hypot(px[i] - Fx, py[i] - Fy); if (dd < 70 * k) near.push([dd, i]); }
+    near.sort((a, b) => a[0] - b[0]);
+    const link = 0.45 + 0.4 * (1 - press) + 0.4 * tipGlow;
+    ctx.strokeStyle = `rgba(255,214,218,${Math.min(0.95, link)})`; ctx.lineWidth = 1.2; ctx.beginPath();
+    for (const [, i] of near.slice(0, 4)) { ctx.moveTo(Fx, Fy); ctx.lineTo(px[i], py[i]); }
+    ctx.stroke();
+    dot(Fx, Fy, 3 + 4 * tipGlow, `rgba(${RED},${0.35 + 0.4 * tipGlow})`); dot(Fx, Fy, 2.4, 'rgba(255,230,232,.95)');
+    if (bridgeT >= 0) {
+      const f = (t - bridgeT) / 0.3;
+      if (f >= 1) { bridgeT = -9; glow[tgt] = 1; const e = adj[tgt][(rnd() * adj[tgt].length) | 0]; if (e !== undefined) Object.assign(pulses[0], { e, t: 0, dir: E[e][0] === tgt ? 1 : -1, v: 2 }); }
+      else { const x = Fx + (px[tgt] - Fx) * f, y = Fy + (py[tgt] - Fy) * f; dot(x, y, 8, `rgba(${RED},.25)`); dot(x, y, 2.2, 'rgba(255,230,232,1)'); }
+    }
+
+    // ---- contact spark + shock ring on every tap ----
     const age = t - tapT;
     const g = ctx.createRadialGradient(px[tgt], py[tgt], 0, px[tgt], py[tgt], 26 * k);
-    g.addColorStop(0, `rgba(255,214,218,${0.75 * (1 - press)})`); g.addColorStop(1, 'rgba(217,42,57,0)');
+    g.addColorStop(0, `rgba(255,214,218,${0.7 * (1 - press)})`); g.addColorStop(1, 'rgba(217,42,57,0)');
     ctx.fillStyle = g; ctx.beginPath(); ctx.arc(px[tgt], py[tgt], 26 * k, 0, 6.2832); ctx.fill();
     if (age >= 0 && age < 1) {
       ctx.strokeStyle = `rgba(${RED},${0.7 * (1 - age)})`; ctx.lineWidth = 1.5;
@@ -236,7 +314,7 @@
       ctx.fillStyle = `rgba(255,214,218,${0.85 * g})`; ctx.beginPath(); ctx.arc(px[i], py[i], 2.1, 0, 6.2832); ctx.fill();
     }
     ctx.globalAlpha = 1;
-    drawRobot(t, S, cx, cy, robotFade);
+    drawRobot(t, reduce ? 0 : dt, S, cx, cy, robotFade);
     if (!reduce) requestAnimationFrame(frame);
   }
 
