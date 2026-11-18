@@ -111,3 +111,21 @@ header{position:sticky;top:0;z-index:40;background:#080507d9;-webkit-backdrop-fi
 @media(prefers-reduced-motion:reduce){.demo-panel{animation:none}}
 .demo-stage video{display:block;width:100%;max-height:calc(100svh - 150px);background:#000}.hero .actions .demo-open{padding:12px 18px}
 .demo-panel:has(video){width:min(880px,100%)}.demo-stage:has(video){min-height:0}.demo-stage video{aspect-ratio:1.8935/1;object-fit:contain}
+
+/* Internship sections: copy on the left, demo reel on the right */
+.internship{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:48px;align-items:start}
+.internship-copy h3{margin-bottom:14px}
+.internship-copy .prose{margin:0 0 18px;font-size:16px}
+.internship-copy .actions{margin-top:24px}
+.internship-demos .eyebrow{margin-bottom:14px}
+.demo-reel{display:grid;gap:14px}
+.demo-tile{position:relative;display:grid;place-items:center;aspect-ratio:16/9;width:100%;padding:0;border:1px solid var(--line);border-radius:4px;overflow:hidden;cursor:pointer;color:var(--ink);font:inherit;background:var(--poster,none) center/cover,linear-gradient(145deg,#1d1115,#0a0306);transition:border-color .25s,transform .25s,box-shadow .25s}
+.demo-tile:before{content:'';position:absolute;inset:0;background:linear-gradient(#0000 40%,#000b)}
+.demo-tile:hover,.demo-tile:focus-visible{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 14px 40px #d92a3930;color:var(--ink)}
+.demo-tile:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.demo-tile .play{position:relative;display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:#d92a39e6;font-size:20px;padding-left:4px;box-shadow:0 0 0 8px #d92a3933;transition:transform .25s}
+.demo-tile:hover .play{transform:scale(1.1)}
+.demo-tile-label{position:absolute;left:14px;bottom:10px;right:14px;text-align:left;font:600 11px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.demo-tile.demo-open{background:var(--poster,none) center/cover,linear-gradient(145deg,#1d1115,#0a0306);box-shadow:none;padding:0}
+.demo-tile.demo-open:hover{box-shadow:0 14px 40px #d92a3930}
+@media(max-width:900px){.internship{grid-template-columns:1fr;gap:32px}}

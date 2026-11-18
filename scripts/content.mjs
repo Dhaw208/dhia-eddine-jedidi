@@ -36,8 +36,13 @@ export function parseReadme(raw) {
     const bullets = p.lines.filter(l => /^- /.test(l)).map(l => clean(l.slice(2)));
     const paragraphs = text(summaryLines.filter(l => !/^`|!\[|<img\b/.test(l.trim())));
     const urls = [...body.matchAll(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g)];
-    return { title: p.title, slug: slug(p.title), source: p.source, description: paragraphs.join(' ') || bullets[0] || '', highlights: bullets, technologies, explanation,
-      github: urls.find(m => /github\.com\//.test(m[2]))?.[2], demo: urls.find(m => /demo|live/i.test(m[1]))?.[2],
+    // Demo links: any link whose label contains "demo" or "live". "Demo: Dashboard" -> title "Dashboard"; plain "Live Demo" -> "Demo".
+    const demos = urls.filter(m => /demo|live/i.test(m[1])).map(m => ({ title: clean(m[1]).replace(/^(live\s+)?demo\s*[:\-–—]?\s*/i, '').trim() || 'Demo', url: m[2] }));
+    // Kind: an internship names its company in bold on the line that mentions the internship; "freelance" is its own label; the rest are personal/academic.
+    const company = (p.lines.find(l => /internship/i.test(l)) || '').match(/\*\*([^*]+)\*\*/)?.[1];
+    const kind = company ? 'internship' : /freelance/i.test(body) ? 'freelance' : 'personal';
+    return { title: p.title, slug: slug(p.title), source: p.source, kind, company: company || undefined, description: paragraphs.join(' ') || bullets[0] || '', highlights: bullets, technologies, explanation,
+      github: urls.find(m => /github\.com\//.test(m[2]))?.[2], demo: demos[0]?.url, demos,
       images: [...body.matchAll(/!\[([^\]]*)\]\(([^)]+)\)/g)].map(m => ({alt:m[1],src:m[2]})) };
   });
   const skills = []; let group;
@@ -46,6 +51,6 @@ export function parseReadme(raw) {
     else if (group) { for (const m of l.matchAll(/!\[([^\]]+)\]|`([^`]+)`/g)) group.items.push(m[1] || m[2]); if (/^- /.test(l)) group.items.push(clean(l.slice(2))); }
   }
   return {name, portrait: raw.match(/!\[Portrait\]\((assets\/[^)]+)\)/i)?.[1], title: clean(intro.find(l => /^### /.test(l))?.slice(4) || ''), summary: text(intro.filter(l => !l.startsWith('📍') && !/<img\b|!\[/.test(l))).join(' '), location: clean(intro.find(l => l.startsWith('📍')) || ''), about: text(section(/About/i)), focus: section(/About/i).filter(l => /^- /.test(l)).map(l => clean(l.slice(2))), projects: normalized, skills,
-    experience: normalized.filter(p => /Worked On|Experience/i.test(p.source)), education: blocks(section(/Education/i)).map(clean), certifications: section(/Certifications/i).filter(l => /^- /.test(l)).map(l => clean(l.slice(2))), languages: section(/Languages/i).filter(l => /—/.test(l)).map(clean),
+    experience: normalized.filter(p => /Worked On|Experience/i.test(p.source)), internships: normalized.filter(p => p.kind === 'internship'), personal: normalized.filter(p => p.kind !== 'internship'), education: blocks(section(/Education/i)).map(clean), certifications: section(/Certifications/i).filter(l => /^- /.test(l)).map(l => clean(l.slice(2))), languages: section(/Languages/i).filter(l => /—/.test(l)).map(clean),
     linkedin: links.find(u => /linkedin\.com/.test(u)), github: links.find(u => /github\.com/.test(u)), email: raw.match(/mailto:([^\s)]+)/)?.[1], contact: text(section(/Contact|Connect/i).length ? section(/Contact|Connect/i) : lines.some(l => /### .*Let's Connect/.test(l)) ? lines.slice(lines.findIndex(l => /### .*Let's Connect/.test(l)) + 1) : []).join(' ')};
 }

@@ -57,3 +57,16 @@ test('portrait and expanded explanations stay README-driven', () => {
  assert.match(render(data),/class="portrait"/);
  assert.match(render(data),/<details class="project-preview">/);
 });
+
+test('splits internships from personal/academic projects and collects several demos', () => {
+ const data = parseReadme(raw);
+ assert.deepEqual(data.internships.map(p => p.company), ['Octomiro','El Fouladh']);
+ assert.equal(data.internships.length + data.personal.length, data.projects.length);
+ assert.ok(data.personal.every(p => p.kind !== 'internship'));
+ const edited = raw.replace('[Live Demo](https://www.linkedin.com/feed/update/urn:li:activity:7372196138487287808/)', '[Demo: Dashboard](https://www.linkedin.com/feed/update/urn:li:activity:1/)\n[Demo: Retraining](https://www.linkedin.com/feed/update/urn:li:activity:2/)');
+ const ocr = parseReadme(edited).internships[1];
+ assert.deepEqual(ocr.demos.map(d => d.title), ['Dashboard','Retraining']);
+ const html = render(parseReadme(edited));
+ assert.equal(html.match(/class="demo-tile demo-open"/g).length, 2);
+ assert.ok(html.includes('id="experience"') && html.includes('id="internship-el-fouladh"'));
+});

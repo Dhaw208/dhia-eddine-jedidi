@@ -64,3 +64,16 @@ Tools named in the README have locally hosted Devicon logos where available, wit
 ## WebGL hero
 
 The home page opens with an interactive particle-bust hero (`assets/hero/`, source in `hero/`). It appears only when the browser supports WebGL2 (`html.hero-gl`); otherwise the original portrait hero is shown and the hero script is never downloaded. Content still comes from README.md. See `hero/README.md` to rebuild the bundle or regenerate the particle data.
+
+## Internships, personal projects and demos
+
+Projects whose text names a company in bold on the line that mentions an "internship" (for example `during my internship at **El Fouladh**`) get their own **Internship** section on the home page, with the company as the heading. Everything else is shown in **Personal & academic** (projects mentioning "freelance" carry a Freelance label).
+
+Add demos with links whose label contains "demo" or "live", anywhere in the project's README section. Use as many as you like:
+
+```
+[Demo: Operator dashboard](https://www.linkedin.com/feed/update/urn:li:activity:123.../)
+[Demo: Retraining flow](https://www.linkedin.com/feed/update/urn:li:activity:456.../)
+```
+
+LinkedIn post links open in the in-page video popup. For instant native playback, save the video as `assets/demos/<project-slug>.mp4` (plus `<project-slug>.jpg` as poster); the second demo uses `<project-slug>-2.mp4`, the third `-3`, and so on. Without a file, the popup falls back to LinkedIn's embed. Other links become plain "Live demo" links.
