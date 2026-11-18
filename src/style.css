@@ -129,3 +129,12 @@ header{position:sticky;top:0;z-index:40;background:#080507d9;-webkit-backdrop-fi
 .demo-tile.demo-open{background:var(--poster,none) center/cover,linear-gradient(145deg,#1d1115,#0a0306);box-shadow:none;padding:0}
 .demo-tile.demo-open:hover{box-shadow:0 14px 40px #d92a3930}
 @media(max-width:900px){.internship{grid-template-columns:1fr;gap:32px}}
+
+/* Company logos replace concept illustrations on internship projects */
+.project-visual.project-logo{background:#f3ecec}
+.project-visual.project-logo img{aspect-ratio:20/9;object-fit:contain;padding:28px 40px;box-sizing:border-box;background:none}
+.project-visual-large.project-logo{max-width:560px}
+.card:hover .project-logo img{transform:none}
+.internship-side{display:grid;gap:22px}
+.internship-side .project-visual{margin:0;border:1px solid var(--line);border-radius:4px}
+.internship-side .project-logo img{aspect-ratio:16/7}

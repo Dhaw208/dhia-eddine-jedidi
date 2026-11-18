@@ -44,7 +44,7 @@ I enjoy working on problems where AI has to perform reliably outside the noteboo
 
 ### 🏭 OctoNorm — Industrial Visual Quality Control
 
-![Concept illustration: OctoNorm — Industrial Visual Quality Control](assets/projects/octonorm-industrial-visual-quality-control.svg)
+![Octomiro logo](assets/logos/octomiro.png)
 
 AI-powered visual inspection system developed during my AI Engineering internship at **Octomiro**.
 
@@ -66,7 +66,7 @@ The implementation combines Flask, React and Docker, with production inference o
 
 ### 📄 OCR + BERT Document Classification
 
-![Concept illustration: OCR + BERT Document Classification](assets/projects/ocr-bert-document-classification.svg)
+![El Fouladh logo](assets/logos/el-fouladh.png)
 
 Developed during my internship at **El Fouladh**.
 
