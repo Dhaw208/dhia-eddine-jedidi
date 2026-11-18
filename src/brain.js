@@ -1,4 +1,4 @@
-﻿/* Neural-brain background: a 3D wireframe brain of nodes + synapses with firing pulses.
+/* Neural-brain background: a 3D wireframe brain of nodes + synapses with firing pulses.
    Pure Canvas 2D, no dependencies. Reacts to cursor and scroll; static when reduced motion is on. */
 (() => {
   const cv = document.querySelector('.brain-bg');
@@ -81,14 +81,14 @@
     const t = reduce ? 3 : (now - t0) / 1000;
     mx += (tx - mx) * 0.05; my += (ty - my) * 0.05;
     const sy = scrollY;
-    const fade = 1 - 0.68 * Math.min(1, sy / (H * 0.9));
+    const fade = 0.62 * (1 - 0.6 * Math.min(1, sy / (H * 0.9)));
     cv.style.opacity = fade.toFixed(3);
 
     const a = 1.25 + 0.5 * Math.sin(t * 0.16) + mx * 0.55 + sy * 0.0006;   // yaw: rocks around the side profile
     const b = -0.12 + my * 0.22 + 0.05 * Math.sin(t * 0.23);                // pitch
     const ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b);
     const S = Math.min(W * (small ? 0.62 : 0.27), H * 0.5);
-    const cx = W * (small ? 0.5 : 0.36) + mx * -24, cy = H * 0.5 + (sy * -0.05) + 10 * Math.sin(t * 0.5);
+    const cx = W * 0.5 + mx * -24, cy = H * 0.5 + (sy * -0.05) + 10 * Math.sin(t * 0.5);
     const F = 3.4;                                                          // perspective distance
 
     ctx.clearRect(0, 0, W, H);
@@ -154,5 +154,6 @@
   if (!reduce) requestAnimationFrame(frame);
   else addEventListener('scroll', () => frame(performance.now()), { passive: true });
 })();
+
 
 

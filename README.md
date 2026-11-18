@@ -76,6 +76,8 @@ Developed during my internship at **El Fouladh**.
 - Automated document routing
 - Reduced processing time by approximately **90%**
 
+[Live Demo](https://www.linkedin.com/feed/update/urn:li:activity:7372196138487287808/)
+
 #### From documents to automated routing
 
 This project combines OCR with a BERT document classification pipeline, developed during my internship at El Fouladh. The pipeline supports automated document routing, connecting document processing with classification.

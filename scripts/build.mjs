@@ -23,6 +23,7 @@ await cp(path.join(root,'assets'),path.join(out,'assets'),{recursive:true});
 await cp(path.join(root,'src/style.css'),path.join(out,'style.css'));
 await cp(path.join(root,'src/motion.js'),path.join(out,'motion.js'));
 await cp(path.join(root,'src/brain.js'),path.join(out,'brain.js'));
+await cp(path.join(root,'src/demo.js'),path.join(out,'demo.js'));
 await writeFile(path.join(out,'data/portfolio.json'),JSON.stringify(data,null,2));
 await writeFile(path.join(out,'index.html'),render(data,undefined,hero));
 for (const project of data.projects) {
