@@ -89,6 +89,30 @@ A Flask REST API exposes the pipeline for application integration. The reported 
 
 ---
 
+### 🎮 BGA X-Ray Defect Detection
+
+![MPSI logo](assets/logos/mpsi.svg)
+
+Developed during my final-year internship (Applied Mathematics: Data Science) at **MPSI** (Maintenance Partner Solutions International), a Sony PlayStation after-sales service and refurbishment subcontractor in Tunisia.
+
+- Deep-learning classifier for X-ray images of BGA components on PlayStation boards, detecting solder-ball short circuits ("CC billes") on the SoC
+- Dataset provided by MPSI: **720 X-ray images** (375 normal, 355 short-circuit), expanded to **5,439 images** with data augmentation
+- Compared pre-trained CNNs and selected **VGG16**, tuned for 20 epochs, the Adam optimizer and a 0.0001 learning rate
+- Data augmentation lifted test accuracy from about **64% to about 94%**
+- Delivered as a web application where operators upload an X-ray image and get a result, with test history, supervisor and administrator roles
+
+`Python` · `TensorFlow` · `Keras` · `VGG16` · `Jupyter Notebook`
+
+#### From manual X-ray inspection to automatic detection
+
+MPSI repairs and refurbishes electronic boards, including PlayStation consoles, and checks BGA (ball grid array) components with X-ray imaging. The goal of this internship was a fast, easy-to-use model that detects defects automatically and reduces human intervention in the inspection step. The work focused on the short-circuit case on the SoC.
+
+The pipeline preprocesses the X-ray images (border and corner cropping, artifact removal with histogram equalization and region-of-interest handling, resizing), then classifies them with a transfer-learned CNN. Several pre-trained architectures were compared, and VGG16 gave the highest accuracy and lowest loss. Training on the augmented dataset raised test accuracy from 0.638 to 0.94, with a test loss falling from 0.98 to 0.23.
+
+The model was then wrapped in a web application designed with UML use-case and sequence diagrams. Workers test a component by submitting its X-ray image and name and can review the history of saved tests, supervisors check their decisions, and administrators manage the component database.
+
+---
+
 ### 🎯 YOLOv8 Object Detection
 
 ![Concept illustration: YOLOv8 Object Detection](assets/projects/yolov8-object-detection.svg)

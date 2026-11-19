@@ -7,7 +7,7 @@ const raw = await readFile(new URL('../README.md',import.meta.url),'utf8');
 test('extracts the complete profile without manufacturing facts', () => {
  const data = parseReadme(raw);
  assert.equal(data.name,'Dhia Eddine Jedidi');
- assert.equal(data.projects.length,7); assert.equal(data.experience.length,3);
+ assert.equal(data.projects.length,8); assert.equal(data.experience.length,4);
  assert.equal(data.education.length,2); assert.equal(data.certifications.length,6);
  assert.equal(data.skills.length,5); assert.equal(data.email,undefined);
  for (const p of data.projects) {if (p.slug!=='gaming-anxiety-data-analysis') assert.equal(p.github,undefined); if (!['octonorm-industrial-visual-quality-control','ocr-bert-document-classification','bi-analytics-platform','gaming-anxiety-data-analysis'].includes(p.slug)) assert.equal(p.demo,undefined);}
@@ -18,9 +18,9 @@ test('README changes propagate without changing UI or data files', () => {
  const edited = raw.replace('Dhia Eddine Jedidi 👋','Example Name 👋').replace('Bizerte, Tunisia','Paris, France').replace('0.967 AUROC','0.980 AUROC') + '\n## Projects\n### New project\nA source-authored description.\n`Python`\n\n[GitHub](https://github.com/example/project)\n[Live Demo](https://example.com/demo)\n';
  const data = parseReadme(edited);
  assert.equal(data.name,'Example Name'); assert.match(data.location,/Paris/); assert.doesNotMatch(data.summary,/Paris/);
- assert.equal(data.projects.length,8); assert.ok(data.projects[0].highlights.includes('Achieved 0.980 AUROC'));
- assert.equal(data.projects[7].github,'https://github.com/example/project');
- assert.equal(data.projects[7].demo,'https://example.com/demo');
+ assert.equal(data.projects.length,9); assert.ok(data.projects[0].highlights.includes('Achieved 0.980 AUROC'));
+ assert.equal(data.projects[8].github,'https://github.com/example/project');
+ assert.equal(data.projects[8].demo,'https://example.com/demo');
  assert.match(render(data),/Example Name/);
 });
 test('missing contact is omitted and raw markup is escaped', () => {
@@ -60,7 +60,7 @@ test('portrait and expanded explanations stay README-driven', () => {
 
 test('splits internships from personal/academic projects and collects several demos', () => {
  const data = parseReadme(raw);
- assert.deepEqual(data.internships.map(p => p.company), ['Octomiro','El Fouladh']);
+ assert.deepEqual(data.internships.map(p => p.company), ['Octomiro','El Fouladh','MPSI']);
  assert.equal(data.internships.length + data.personal.length, data.projects.length);
  assert.ok(data.personal.every(p => p.kind !== 'internship'));
  const edited = raw.replace('[Live Demo](https://www.linkedin.com/feed/update/urn:li:activity:7372196138487287808/)', '[Demo: Dashboard](https://www.linkedin.com/feed/update/urn:li:activity:1/)\n[Demo: Retraining](https://www.linkedin.com/feed/update/urn:li:activity:2/)');
