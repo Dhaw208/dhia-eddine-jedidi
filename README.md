@@ -56,7 +56,8 @@ AI-powered visual inspection system developed during my AI Engineering internshi
 - Production inference running on a **V100S GPU server**
 - Built a retraining workflow accessible from the operator dashboard
 
-[Live Demo](/assets/demos/octonorm-industrial-visual-quality-control.mp4)
+[Demo: Video walkthrough](/assets/demos/octonorm-industrial-visual-quality-control.mp4)
+[Demo: Full presentation](https://www.canva.com/design/DAHMHPYnsjM/UDcx2-3up850nXb8qghgPQ/view)
 
 #### From manual inspection to an operator-facing system
 
