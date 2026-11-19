@@ -10,7 +10,7 @@ test('extracts the complete profile without manufacturing facts', () => {
  assert.equal(data.projects.length,7); assert.equal(data.experience.length,3);
  assert.equal(data.education.length,2); assert.equal(data.certifications.length,6);
  assert.equal(data.skills.length,5); assert.equal(data.email,undefined);
- for (const p of data.projects) {if (p.slug!=='gaming-anxiety-data-analysis') assert.equal(p.github,undefined); if (!['ocr-bert-document-classification','bi-analytics-platform','gaming-anxiety-data-analysis'].includes(p.slug)) assert.equal(p.demo,undefined);}
+ for (const p of data.projects) {if (p.slug!=='gaming-anxiety-data-analysis') assert.equal(p.github,undefined); if (!['octonorm-industrial-visual-quality-control','ocr-bert-document-classification','bi-analytics-platform','gaming-anxiety-data-analysis'].includes(p.slug)) assert.equal(p.demo,undefined);}
  assert.ok(data.projects[0].highlights.includes('Achieved 0.967 AUROC'));
  assert.equal(data.summary,'Building AI systems that go beyond notebooks — from experimentation and benchmarking to APIs, Docker deployment and production inference.');
 });
@@ -67,6 +67,6 @@ test('splits internships from personal/academic projects and collects several de
  const ocr = parseReadme(edited).internships[1];
  assert.deepEqual(ocr.demos.map(d => d.title), ['Dashboard','Retraining']);
  const html = render(parseReadme(edited));
- assert.equal(html.match(/class="demo-tile demo-open"/g).length, 2);
+ assert.equal(html.match(/class="demo-tile demo-open"/g).length, 3);
  assert.ok(html.includes('id="experience"') && html.includes('id="internship-el-fouladh"'));
 });

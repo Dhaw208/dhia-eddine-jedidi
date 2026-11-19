@@ -27,6 +27,7 @@ export function render(data, project, hero) {
   const actions = `${link(p.linkedin,'LinkedIn ↗')}${link(p.github,'GitHub ↗')}${link(p.email && `mailto:${p.email}`,'Email ↗')}${p.cv ? `<a class="button" href="${safe(p.cv)}" download>Download CV ↓</a>` : ''}`;
   // LinkedIn post demos open in an in-page video popup (src/demo.js); other demos stay plain links.
   const embedOf = u => { const m = /^https:\/\/(?:www\.)?linkedin\.com\/feed\/update\/(urn:li:(?:activity|ugcPost|share):\d+)/.exec(u || ''); return m ? `https://www.linkedin.com/embed/feed/update/${m[1]}` : ''; };
+  const playable = d => embedOf(d.url) || /^\/assets\/demos\//.test(d.url);
   // If assets/demos/<slug>.mp4 exists the popup plays it natively (instant, autoplay-able); otherwise it falls back to LinkedIn's embed.
   // A project can have several demos: the first uses <slug>.mp4, the next <slug>-2.mp4, <slug>-3.mp4 ...
   const localDemo = (pr, i) => { const base = `${pr.slug}${i ? `-${i + 1}` : ''}`; return existsSync(new URL(`../assets/demos/${base}.mp4`, import.meta.url)) ? `/assets/demos/${base}` : ''; };
@@ -34,20 +35,20 @@ export function render(data, project, hero) {
     const v = localDemo(pr, i), many = (pr.demos || []).length > 1 || d.title !== 'Demo';
     return `data-embed="${escape(embedOf(d.url))}" data-href="${safe(d.url)}" data-title="${escape(pr.title + (many ? ` — ${d.title}` : ''))}"${v ? ` data-video="${v}.mp4" data-poster="${v}.jpg"` : ''}${auto ? ' data-auto' : ''}`;
   };
-  const demoAction = (pr, auto = false) => (pr.demos || []).map((d, i) => embedOf(d.url)
+  const demoAction = (pr, auto = false) => (pr.demos || []).map((d, i) => playable(d)
     ? `<button type="button" class="demo-open" ${demoData(pr, d, i, auto && i === 0)}>▶ ${pr.demos.length > 1 || d.title !== 'Demo' ? escape(d.title) : 'Watch demo'}</button>`
     : link(d.url, `${escape(d.title === 'Demo' ? 'Live demo' : d.title)} ↗`)).join('');
   // Big poster tiles used in the internship sections.
   const demoTiles = pr => (pr.demos || []).length ? `<div class="demo-reel">${pr.demos.map((d, i) => {
     const v = localDemo(pr, i), style = v ? ` style="--poster:url('${v}.jpg')"` : '';
-    return embedOf(d.url)
+    return playable(d)
       ? `<button type="button" class="demo-tile demo-open"${style} ${demoData(pr, d, i)}><span class="play" aria-hidden="true">▶</span><span class="demo-tile-label">${escape(d.title === 'Demo' ? 'Watch demo' : d.title)}</span></button>`
       : `<a class="demo-tile"${style} href="${safe(d.url)}"><span class="play" aria-hidden="true">↗</span><span class="demo-tile-label">${escape(d.title === 'Demo' ? 'Live demo' : d.title)}</span></a>`;
   }).join('')}</div>` : '';
   const projectActions = (pr, auto = false) => `${link(pr.github,'GitHub ↗')}${demoAction(pr, auto)}`;
-  const featured = p.projects.find(x => (x.demos || []).some(d => embedOf(d.url)));
+  const featured = p.projects.find(x => (x.demos || []).some(d => playable(d)));
   const demoModal = `<div class="demo-modal" id="demo-modal" role="dialog" aria-modal="true" aria-labelledby="demo-title" hidden><div class="demo-backdrop" data-close></div><div class="demo-panel"><div class="demo-bar"><span id="demo-title">Live demo</span><button type="button" class="demo-close" data-close aria-label="Close demo">✕</button></div><div class="demo-stage"></div><p class="demo-fallback">Video not loading? <a id="demo-link" href="#" target="_blank" rel="noopener noreferrer">Watch it on LinkedIn ↗</a></p></div></div>`;
-  const hasDemo = (project ? [project] : p.projects).some(x => (x.demos || []).some(d => embedOf(d.url)));
+  const hasDemo = (project ? [project] : p.projects).some(x => (x.demos || []).some(d => playable(d)));
   let body;
   if (project) {
     body = `<div class="project-hero"><a href="/#${project.kind === 'internship' ? 'experience' : 'projects'}">← ${project.kind === 'internship' ? 'Internships' : 'All projects'}</a><p class="eyebrow" data-decode>Project / ${escape(project.source)}</p><h1 data-decode>${escape(project.title)}</h1><p class="lead">${escape(project.description)}</p><h2 class="tools-heading">Tools & technologies</h2>${tags(project.technologies, true)}<div class="actions">${projectActions(project, true)}</div>${projectImage(project, true)}</div>${(project.explanation || []).map((detail,i) => section(`explanation-${i}`, 'Inside the project', escape(detail.title), detail.paragraphs.map(t => `<p class="prose">${escape(t)}</p>`).join(''))).join('')}${section('highlights','Implementation','Technical highlights',project.highlights.length ? list(project.highlights) : '')}${section('screenshots','In detail','Screenshots',project.images.filter(im => !/^Concept illustration:/i.test(im.alt)).map(im => { const url = /^https?:/.test(im.src) ? im.src : `/assets/${im.src.replace(/^assets\//,'')}`; return `<img class="screenshot" src="${safe(url)}" alt="${escape(im.alt)}" loading="lazy">`; }).join(''))}`;

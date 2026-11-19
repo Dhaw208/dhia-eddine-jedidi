@@ -35,7 +35,7 @@ export function parseReadme(raw) {
     const technologies = [...new Set([...explicit, ...known.filter(t => new RegExp(`\\b${t}\\b`, 'i').test(body))])];
     const bullets = p.lines.filter(l => /^- /.test(l)).map(l => clean(l.slice(2)));
     const paragraphs = text(summaryLines.filter(l => !/^`|!\[|<img\b/.test(l.trim())));
-    const urls = [...body.matchAll(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g)];
+    const urls = [...body.matchAll(/\[([^\]]+)\]\((https?:\/\/[^)]+|\/assets\/demos\/[^)]+)\)/g)];
     // Demo links: any link whose label contains "demo" or "live". "Demo: Dashboard" -> title "Dashboard"; plain "Live Demo" -> "Demo".
     const demos = urls.filter(m => /demo|live/i.test(m[1])).map(m => ({ title: clean(m[1]).replace(/^(live\s+)?demo\s*[:\-–—]?\s*/i, '').trim() || 'Demo', url: m[2] }));
     // Kind: an internship names its company in bold on the line that mentions the internship; "freelance" is its own label; the rest are personal/academic.

@@ -56,6 +56,8 @@ AI-powered visual inspection system developed during my AI Engineering internshi
 - Production inference running on a **V100S GPU server**
 - Built a retraining workflow accessible from the operator dashboard
 
+[Live Demo](/assets/demos/octonorm-industrial-visual-quality-control.mp4)
+
 #### From manual inspection to an operator-facing system
 
 OctoNorm addresses industrial visual quality control through AI-powered tray inspections. Developed during my AI Engineering internship at Octomiro, it connects model benchmarking with a deployed application that operators can use.
