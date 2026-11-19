@@ -138,3 +138,5 @@ header{position:sticky;top:0;z-index:40;background:#080507d9;-webkit-backdrop-fi
 .internship-side{display:grid;gap:22px}
 .internship-side .project-visual{margin:0;border:1px solid var(--line);border-radius:4px}
 .internship-side .project-logo img{aspect-ratio:16/7}
+
+.certifications:has(.cert-tile){grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px}.cert-tile{display:flex;flex-direction:column;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:9px;overflow:hidden;padding-bottom:12px;transition:border-color .2s,transform .2s}.cert-tile:hover{border-color:#8e1d29;transform:translateY(-3px)}.cert-tile img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:top;background:#fff;border-bottom:1px solid var(--line)}.cert-issuer{font:650 11px/1.4 system-ui;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);padding:10px 12px 0}.cert-name{font-size:13px;line-height:1.4;color:var(--ink);padding:0 12px}.certifications p:has(+ .cert-tile),.certifications>p{grid-column:1/-1}

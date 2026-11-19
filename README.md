@@ -289,9 +289,9 @@ FST, University of Tunis El Manar · 2020–2023
 
 ## 📜 Certifications
 
-- [NVIDIA — Fundamentals of Deep Learning · Jun 2024](/assets/certs/nvidia-fundamentals-of-deep-learning.pdf)
-- [NVIDIA — AI for Predictive Maintenance · Jun 2024](/assets/certs/nvidia-ai-predictive-maintenance.pdf)
-- [NVIDIA — Transformer-Based NLP Applications · Jun 2024](/assets/certs/nvidia-transformer-based-nlp.pdf)
+- [NVIDIA — Fundamentals of Deep Learning · Jun 2024](/assets/certs/nvidia-fundamentals-of-deep-learning.pdf) ![Certificate thumbnail](assets/certs/nvidia-fundamentals-of-deep-learning.jpg)
+- [NVIDIA — AI for Predictive Maintenance · Jun 2024](/assets/certs/nvidia-ai-predictive-maintenance.pdf) ![Certificate thumbnail](assets/certs/nvidia-ai-predictive-maintenance.jpg)
+- [NVIDIA — Transformer-Based NLP Applications · Jun 2024](/assets/certs/nvidia-transformer-based-nlp.pdf) ![Certificate thumbnail](assets/certs/nvidia-transformer-based-nlp.jpg)
 - [IBM — Introduction to Neural Networks and PyTorch · Mar 2024](https://www.coursera.org/account/accomplishments/verify/Q42N64VBBJS8)
 - [AWS Academy — Cloud Foundations](https://www.credly.com/badges/9efde524-4504-4c44-967a-0f2dbd84d6b0)
 - The Hashgraph Association — Hashgraph Developer Course
