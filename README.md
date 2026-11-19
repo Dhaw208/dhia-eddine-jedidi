@@ -107,6 +107,31 @@ The project evaluated both detection quality, measured by mAP, and inference lat
 
 ## 🔬 Featured Projects
 
+### 🎮 Gaming Anxiety Data Analysis
+
+![Concept illustration: Gaming Anxiety Data Analysis](assets/projects/gaming-anxiety-data-analysis.svg)
+
+`Python` · `Jupyter Notebook` · `Pandas` · `Plotly` · `scikit-learn`
+
+- Statistical analysis of anxiety metrics from an online gaming survey
+- Explored how gaming habits relate to anxiety levels
+- Visualizations of the findings and a discussion of possible interventions
+- Dataset of **13,464 respondents** and **55 variables**
+
+[GitHub](https://github.com/dhiaeddinejedidi/GamingBehavior)
+[Live Demo](https://www.linkedin.com/posts/dhia-eddine-jedidi-76927222b_datascience-gaminganxiety-mentalhealth-ugcPost-7217638928781033472-vzAq/)
+[Kaggle Notebook](https://www.kaggle.com/code/dhia0208/gaming-anxiety)
+
+#### Understanding the link between gaming and anxiety
+
+This data science project examines how gaming habits relate to anxiety. It is built in a Jupyter notebook on the public Online Gaming Anxiety dataset from Kaggle, which combines standardized questionnaires (GAD-7 anxiety, Satisfaction With Life and social phobia scales) with details about what, how long and why people play, plus demographics.
+
+The analysis covers the dataset's structure and missing values, descriptive statistics, a correlation heatmap and distribution charts for variables such as age and gender. The sample is young (mean age about 21) and mostly male, which shapes how far the results can be generalized. The notebook closes with thoughts on possible interventions.
+
+The project was published on GitHub and Kaggle and shared on LinkedIn. It strengthened my practical skills in data cleaning, statistical analysis and data visualization.
+
+---
+
 ### 📊 BI & Analytics Platform
 
 ![Concept illustration: BI & Analytics Platform](assets/projects/bi-analytics-platform.svg)

@@ -25,7 +25,7 @@ The parser supports this repository's Markdown structure, including emoji headin
 - `## Certifications`: bullet list. `## Languages`: one language and proficiency per line separated with —.
 - `### 🤝 Let's Connect` at the end of the README, or `## Contact`, supplies the contact paragraph. LinkedIn/GitHub links and mailto links are detected automatically.
 
-All six current projects appear, keeping source order with applied AI work first. Metrics are preserved exactly from the README. Experience entries use the source's project descriptions; absent dates and unspecified roles are not guessed. Empty project subsections are omitted.
+All seven current projects appear, keeping source order with applied AI work first. Metrics are preserved exactly from the README. Experience entries use the source's project descriptions; absent dates and unspecified roles are not guessed. Empty project subsections are omitted.
 
 ## CV
 
