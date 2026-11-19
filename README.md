@@ -289,11 +289,11 @@ FST, University of Tunis El Manar · 2020–2023
 
 ## 📜 Certifications
 
-- NVIDIA — Fundamentals of Deep Learning
-- NVIDIA — AI for Predictive Maintenance
-- NVIDIA — Transformer-Based NLP Applications
+- [NVIDIA — Fundamentals of Deep Learning · Jun 2024](/assets/certs/nvidia-fundamentals-of-deep-learning.pdf)
+- [NVIDIA — AI for Predictive Maintenance · Jun 2024](/assets/certs/nvidia-ai-predictive-maintenance.pdf)
+- [NVIDIA — Transformer-Based NLP Applications · Jun 2024](/assets/certs/nvidia-transformer-based-nlp.pdf)
 - IBM — Deep Learning with PyTorch
-- AWS — Cloud Foundations
+- [AWS Academy — Cloud Foundations](https://www.credly.com/badges/9efde524-4504-4c44-967a-0f2dbd84d6b0)
 - The Hashgraph Association — Hashgraph Developer Course
 
 ---
